@@ -15,11 +15,12 @@ class Mob(pg.sprite.Sprite):
         self.rect=self.image.get_rect()
         self.hit_rect = MOB_HIT_RECT.copy()
         self.hit_rect.center = self.rect.center
-        self.pos = vec(x,y)*TILESIZE
+        self.pos = vec(x,y)
         self.rect.center = self.pos
         self.rot = 0
         self.vel = vec(0,0)
         self.acc = vec(0,0)
+        self.health = MOB_HEALTH
 
     def update(self):
         self.rot = (self.g.player.pos - self.pos).angle_to(vec(1,0))
@@ -36,6 +37,20 @@ class Mob(pg.sprite.Sprite):
         self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.g.walls_group, "y")
         self.rect.center = self.hit_rect.center
+        if self.health < 0 :
+            self.kill()
+
+    def draw_health(self):
+        if self.health >60:
+            col = GREEN
+        elif self.health >30:
+            col = YELLOW
+        else:
+            col = RED
+        width = int(self.rect.width *self.health / MOB_HEALTH)
+        self.health_bar = pg.Rect(0,0,width,7)
+        if self.health < MOB_HEALTH:
+            pg.draw.rect(self.image,col,self.health_bar)
 
 
 

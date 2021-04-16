@@ -3,6 +3,8 @@ import pygame as pg
 import random
 import os
 from settings import *
+from Bullet import *
+vec = pg.math.Vector2
 
 
 
@@ -11,59 +13,49 @@ class Player(pg.sprite.Sprite):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self,self.groups)
         self.g = game
-        self.image = pygame.Surface((TILESIZE, TILESIZE))
-        self.image.fill(GREEN)
+        self.image = self.g.player_img
         self.rect = self.image.get_rect()
-        self.x = x*TILESIZE
-        self.y = y*TILESIZE
-        self.vx = 0
-        self.vy = 0
+        self.hit_rect = PLAYER_HIT_RECT
+        self.hit_rect.center = self.rect.center
+        self.vel = vec(0,0)
+        self.pos = vec(x,y)
+        self.rot = 0
+        self.last_shot = 0
+        self.health = PLAYER_HEALTH
+
 
     def get_keys(self):
-        self.vx,self.vy = 0,0
+        self.rot_speed = 0
+        self.vel = vec(0,0)
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT] or keys[pg.K_a]:
-            self.vx = - PLAYER_SPEED
+            self.rot_speed = PLAYER_ROT_SPEED
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
-            self.vx = PLAYER_SPEED
+            self.rot_speed = -PLAYER_ROT_SPEED
         if keys[pg.K_UP] or keys[pg.K_w]:
-            self.vy = - PLAYER_SPEED
+            self.vel = vec(PLAYER_SPEED,0).rotate(-self.rot)
         if keys[pg.K_DOWN] or keys[pg.K_s]:
-            self.vy =  PLAYER_SPEED
-        if self.vx != 0 and self.vy != 0:
-            self.vx += 0.7071
-            self.vy += 0.7071
-
-
-
-    def collide_with_walls(self,dir):
-        if dir == "x":
-            hits = pg.sprite.spritecollide(self,self.g.walls_group,False)
-            if hits:
-                if self.vx > 0:
-                    self.x=hits[0].rect.left -self.rect.width
-                if self.vx < 0:
-                    self.x=hits[0].rect.right
-                self.vx = 0
-                self.rect.x = self.x
-        if dir == "y":
-            hits = pg.sprite.spritecollide(self,self.g.walls_group,False)
-            if hits:
-                if self.vy > 0:
-                    self.y=hits[0].rect.top -self.rect.width
-                if self.vy< 0:
-                    self.y=hits[0].rect.bottom
-                self.vy = 0
-                self.rect.y = self.y
+            self.vel = vec(-PLAYER_SPEED /2,0).rotate(-self.rot)
+        if keys[pg.K_SPACE]:
+            now = pg.time.get_ticks()
+            if now -self.last_shot > BULLET_RATE:
+                self.last_shot = now
+                dir = vec(1,0).rotate(-self.rot)
+                pos = self.pos + BARREL_OFFSET.rotate(-self.rot)
+                Bullet(self.g,pos,dir)
+                self.vel = vec(-KICKBACK,0).rotate((-self.rot))
 
 
     def update(self):
         self.get_keys()
-        self.x += self.vx * self.g.dt
-        self.y += self.vy * self.g.dt
-
-        self.rect.x = self.x
-        self.collide_with_walls("x")
-        self.rect.y = self.y
-        self.collide_with_walls("y")
+        self.pos+=self.vel *self.g.dt
+        self.rot = (self.rot+self.rot_speed * self.g.dt)%360
+        self.image = pg.transform.rotate(self.g.player_img,self.rot)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+        self.hit_rect.centerx = self.pos.x
+        collide_with_walls(self,self.g.walls_group,"x")
+        self.hit_rect.centery = self.pos.y
+        collide_with_walls(self,self.g.walls_group,"y")
+        self.rect.center = self.hit_rect.center
 

@@ -3,7 +3,7 @@ import pygame as pg
 import random
 import os
 from settings import *
-
+vec = pg.math.Vector2
 
 
 class Player(pg.sprite.Sprite):
@@ -11,23 +11,50 @@ class Player(pg.sprite.Sprite):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self,self.groups)
         self.g = game
-        self.image = pygame.Surface((TILESIZE, TILESIZE))
-        self.image.fill(GREEN)
+        self.dir = "IDLE"
+        self.pn_log = False
+        self.image = self.g.Jump_animation[0]
+        self.frame = 0
+        self.last_update = pg.time.get_ticks()
+        self.frame_rate = 120
         self.rect = self.image.get_rect()
-        self.x = x
-        self.y = y
+        self.hit_rect = PLAYER_HIT_RECT
+        self.hit_rect.center = self.rect.center
+        self.vel = vec(0, 0)
+        self.pos = vec(x, y)
+        self.rot = 0
 
-    def move(self,dx=0,dy=0):
-        if not self.collide_with_walls(dx,dy):
-            self.x += dx
-            self.y += dy
 
-    def collide_with_walls(self,dx=0,dy=0):
-        for wall in self.g.walls_group:
-            if wall.x == self.x+dx and wall.y == self.y+dy:
-                return True
-        return false
 
     def update(self):
-        self.rect.x = self.x * TILESIZE
-        self.rect.y = self.y * TILESIZE
+
+
+
+        self.pos += self.vel * self.g.dt
+        if self.dir == "IDLE":
+            self.rot = 0
+        if self.dir == "LEFT":
+            self.rot = 90
+        if self.dir == "RIGHT":
+            self.rot = 270
+        if self.dir == "DOWN":
+            self.rot = 180
+        self.image = pg.transform.rotate(self.g.player_img, self.rot)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+        self.hit_rect.centerx = self.pos.x
+        collide_with_walls(self, self.g.walls_group, "x")
+        self.hit_rect.centery = self.pos.y
+        collide_with_walls(self, self.g.walls_group, "y")
+        self.rect.center = self.hit_rect.center
+        hits = pg.sprite.spritecollide(self, self.g.logs_group, False)
+        if hits:
+            self.on_log = True
+        else:
+            self.on_log = False
+        if self.on_log:
+            self.pos.x = hits[0].rect.centerx
+
+
+
+

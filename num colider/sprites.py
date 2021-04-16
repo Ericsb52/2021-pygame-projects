@@ -3,20 +3,38 @@ import pygame as pg
 import random
 import os
 from settings import *
+vec = pg.math.Vector2
 
 
-
-class Player(pg.sprite.Sprite):
-    def __init__(self):
+class Block(pg.sprite.Sprite):
+    def __init__(self,game,x,y):
         pg.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((50, 50))
+        self.image = pygame.Surface((TILESIZE, TILESIZE))
+        self.g = game
         self.image.fill(GREEN)
-        # self.image = player_img
-        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
-        self.rect.center = (WIDTH / 2, HEIGHT / 2)
+        self.rect.topleft = (x, y)
+        self.dir ="idle"
+        self.pos = vec(x,y)
+        self.vel = vec(0, 0)
+        self.acc = vec(0, 0)
+
+    def move(self,dx=0,dy=0):
+        self.acc.x += dx
+        self.acc.y += dy
+
+
+
+    def collide_with_bounds(self):
+        pass
 
     def update(self):
-        self.rect.x += 5
-        if self.rect.left > WIDTH:
-            self.rect.right = 0
+        # apply friction
+        self.acc.x += self.vel.x * FRICTION
+        # equations of motion
+        self.vel += self.acc
+        if abs(self.vel.x) < 0.1:
+            self.vel.x = 0
+        self.pos += self.vel + 0.5 * self.acc
+
+        self.rect.topleft = self.pos
