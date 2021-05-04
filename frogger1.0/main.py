@@ -18,7 +18,7 @@ from lilypad import *
 class Game(object):
 
     def __init__(self):
-        self.running = True
+        self.running = True 
         # initialize pygame and create window
         pg.init()
         pg.mixer.init()  # for sound

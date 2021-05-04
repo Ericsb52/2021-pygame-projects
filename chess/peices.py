@@ -17,12 +17,19 @@ class Pawn(pg.sprite.Sprite):
             self.g.black_group.add(self)
         self.rect = self.image.get_rect()
         self.rect.center=(x,y)
-        self.pos = self.rect.center
-        self.old_pos = self.rect.center
+        self.pos = vec(self.rect.centerx,self.rect.centery)
+        self.old_pos = vec(self.rect.centerx,self.rect.centery)
         self.held = False
 
     def show_avalable_moves(self):
         pass
+
+
+    def place_peice(self,x,y):
+
+        self.old_pos = vec(x,y)
+        self.held = False
+        self.g.switch_turn()
 
     def update(self):
 
@@ -59,6 +66,14 @@ class King(pg.sprite.Sprite):
     def show_avalable_moves(self):
         pass
 
+    def place_peice(self, x, y):
+
+        self.old_pos = vec(x, y)
+
+        self.held = False
+
+        self.g.switch_turn()
+
     def update(self):
 
         if self.held == True:
@@ -91,6 +106,13 @@ class Queen(pg.sprite.Sprite):
     def show_avalable_moves(self):
         pass
 
+    def place_peice(self, x, y):
+
+        self.old_pos = vec(x, y)
+
+        self.held = False
+
+        self.g.switch_turn()
     def update(self):
 
         if self.held == True:
@@ -123,6 +145,13 @@ class Bishop(pg.sprite.Sprite):
     def show_avalable_moves(self):
         pass
 
+    def place_peice(self, x, y):
+
+        self.old_pos = vec(x, y)
+
+        self.held = False
+
+        self.g.switch_turn()
     def update(self):
 
         if self.held == True:
@@ -154,6 +183,14 @@ class Knight(pg.sprite.Sprite):
 
     def show_avalable_moves(self):
         pass
+
+    def place_peice(self, x, y):
+
+        self.old_pos = vec(x, y)
+
+        self.held = False
+
+        self.g.switch_turn()
 
     def update(self):
 
@@ -187,6 +224,13 @@ class Rook(pg.sprite.Sprite):
     def show_avalable_moves(self):
         pass
 
+    def place_peice(self, x, y):
+
+        self.old_pos = vec(x, y)
+
+        self.held = False
+
+        self.g.switch_turn()
     def update(self):
 
         if self.held == True:

@@ -34,29 +34,29 @@ class Game(object):
         self.board_img_black = pg.transform.scale(self.board_img_black, (tilesize, tilesize-1))
         self.board_imgs.append(self.board_img_black)
         self.w_pawn = pg.image.load(path.join(img_folder,"w_pawn.png"))
-        self.w_pawn = pg.transform.scale(self.w_pawn,(tilesize-10,tilesize-10))
+        self.w_pawn = pg.transform.scale(self.w_pawn,(tilesize-20,tilesize-20))
         self.b_pawn = pg.image.load(path.join(img_folder,"b_pawn.png"))
-        self.b_pawn = pg.transform.scale(self.b_pawn,(tilesize-10,tilesize-10))
+        self.b_pawn = pg.transform.scale(self.b_pawn,(tilesize-20,tilesize-20))
         self.w_king = pg.image.load(path.join(img_folder, "w_king.png"))
-        self.w_king = pg.transform.scale(self.w_king, (tilesize - 10, tilesize - 10))
+        self.w_king = pg.transform.scale(self.w_king, (tilesize - 20, tilesize - 20))
         self.b_king = pg.image.load(path.join(img_folder, "b_king.png"))
-        self.b_king = pg.transform.scale(self.b_king, (tilesize - 10, tilesize - 10))
+        self.b_king = pg.transform.scale(self.b_king, (tilesize - 20, tilesize - 20))
         self.w_queen = pg.image.load(path.join(img_folder, "w_queen.png"))
-        self.w_queen = pg.transform.scale(self.w_queen, (tilesize - 10, tilesize - 10))
+        self.w_queen = pg.transform.scale(self.w_queen, (tilesize - 20, tilesize - 20))
         self.b_queen = pg.image.load(path.join(img_folder, "b_queen.png"))
-        self.b_queen = pg.transform.scale(self.b_queen, (tilesize - 10, tilesize - 10))
+        self.b_queen = pg.transform.scale(self.b_queen, (tilesize - 20, tilesize - 20))
         self.w_rook = pg.image.load(path.join(img_folder, "w_rook.png"))
-        self.w_rook = pg.transform.scale(self.w_rook, (tilesize - 10, tilesize - 10))
+        self.w_rook = pg.transform.scale(self.w_rook, (tilesize - 20, tilesize - 20))
         self.b_rook = pg.image.load(path.join(img_folder, "b_rook.png"))
-        self.b_rook = pg.transform.scale(self.b_rook, (tilesize - 10, tilesize - 10))
+        self.b_rook = pg.transform.scale(self.b_rook, (tilesize - 20, tilesize -20))
         self.w_bishop = pg.image.load(path.join(img_folder, "w_bishop.png"))
-        self.w_bishop = pg.transform.scale(self.w_bishop, (tilesize - 10, tilesize - 10))
+        self.w_bishop = pg.transform.scale(self.w_bishop, (tilesize - 20, tilesize - 20))
         self.b_bishop = pg.image.load(path.join(img_folder, "b_bishop.png"))
-        self.b_bishop = pg.transform.scale(self.b_bishop, (tilesize - 10, tilesize - 10))
+        self.b_bishop = pg.transform.scale(self.b_bishop, (tilesize - 20, tilesize - 20))
         self.w_knight = pg.image.load(path.join(img_folder, "w_knight.png"))
-        self.w_knight = pg.transform.scale(self.w_knight, (tilesize - 10, tilesize - 10))
+        self.w_knight = pg.transform.scale(self.w_knight, (tilesize - 20, tilesize - 20))
         self.b_knight = pg.image.load(path.join(img_folder, "b_knight.png"))
-        self.b_knight = pg.transform.scale(self.b_knight, (tilesize - 10, tilesize - 10))
+        self.b_knight = pg.transform.scale(self.b_knight, (tilesize - 20, tilesize - 20))
 
     def new(self):
         self.all_sprites = pg.sprite.Group()
@@ -134,7 +134,6 @@ class Game(object):
 
 
             if event.type == pg.MOUSEBUTTONDOWN and self.pointer.held == False and self.can_click_mouse:
-                print("testing mouse")
                 self.pointer.held = True
                 self.can_click_mouse = False
             if event.type == pg.MOUSEBUTTONUP:
@@ -144,18 +143,43 @@ class Game(object):
 
         if self.turn == "white":
             hits = pg.sprite.spritecollide(self.pointer, self.white_group, False)
-
             if self.clicked[0] and hits and len(self.peice_held) < 1:
-                print("test")
                 self.peice_held.append(hits[0])
                 self.peice_held[0].held = True
+
+            if len(self.peice_held) > 0 and self.pointer.held == True and self.can_click_mouse:
+                hits = pg.sprite.spritecollide(self.peice_held[0],self.board_group,False)
+                if self.clicked[0] and hits and hits[0].ocupied == False:
+                    self.peice_held[0].place_peice(hits[0].rect.centerx, hits[0].rect.centery)
+                    temp_list = self.peice_held[:]
+                    for i in temp_list:
+                        self.peice_held.remove(i)
+                    self.pointer.held = False
+                    self.can_click_mouse = True
+                    hits[0].ocupied = True
+
+
+
+
+
+
         if self.turn == "black":
             hits = pg.sprite.spritecollide(self.pointer, self.black_group, False)
-
             if self.clicked[0] and hits and len(self.peice_held) < 1:
-                print("test")
                 self.peice_held.append(hits[0])
                 self.peice_held[0].held = True
+            if len(self.peice_held) > 0 and self.pointer.held == True and self.can_click_mouse:
+                hits = pg.sprite.spritecollide(self.peice_held[0],self.board_group,False)
+                if self.clicked[0] and hits and hits[0].ocupied == False:
+                    self.peice_held[0].place_peice(hits[0].rect.centerx, hits[0].rect.centery)
+                    temp_list = self.peice_held[:]
+                    for i in temp_list:
+                        self.peice_held.remove(i)
+                    self.pointer.held = False
+                    self.can_click_mouse = True
+                    hits[0].ocupied = True
+                    
+
 
 
     def update(self):
